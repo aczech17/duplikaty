@@ -1,0 +1,3 @@
+/home/tytjan17/Dokumenty/duplikaty/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/tytjan17/Dokumenty/duplikaty/cmake-build-debug/CMakeFiles/duplikaty.dir
+/home/tytjan17/Dokumenty/duplikaty/cmake-build-debug/CMakeFiles/edit_cache.dir
