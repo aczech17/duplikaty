@@ -13,6 +13,52 @@ typedef struct
 fileInfo* head = NULL;
 fileInfo* tail = NULL;
 
+int filesEqual(const char* path1, const char* path2)
+{
+    FILE* file1 = fopen(path1, "rb");
+    FILE* file2 = fopen(path2, "rb");
+    if(!file1 || !file2)
+        return 2;
+    int result = 1;
+    while(1)
+    {
+        int byte1 = getc(file1);
+        int byte2 = getc(file2);
+        if(byte1!=byte2)
+        {
+            result = 0;
+            break;
+        }
+        if(byte1 == EOF)
+        {
+            result = 1;
+            break;
+        }
+    }//while
+
+    fclose(file1);
+    fclose(file2);
+    return result;
+}
+
+int checkForDuplicates(const char* newFile)
+{
+    fileInfo* listedFile = head;
+    while(listedFile)
+    {
+        if( filesEqual(newFile, listedFile->pathName) == 2)
+            continue;
+        if( filesEqual(newFile, listedFile->pathName) )
+        {
+            printf("rm %s\n", newFile);
+            printf("ln %s %s\n", listedFile->pathName, newFile);
+            return 1;
+        }
+        listedFile = listedFile->next;
+    }
+    return 0;
+}
+
 void stringJoin(char* dest, const char* src1, const char* src2)
 {
     int i = 0;
@@ -30,22 +76,6 @@ void stringJoin(char* dest, const char* src1, const char* src2)
         ++j;
     }
     dest[i] = 0;
-}
-
-int filesEqual(const char* path1, const char* path2)
-{
-    FILE* file1 = fopen(path1, "rb");
-    FILE* file2 = fopen(path2, "rb");
-    while( !feof(file1) && !feof(file2) )
-    {
-        int byte1 = fgetc(file1);
-        int byte2 = fgetc(file2);
-        if(byte1 != byte2)
-        {
-            return 0;
-        }//if
-    }
-    return feof(file1) && feof(file2);
 }
 
 void addToList(struct dirent* file, const char* pathName)
@@ -85,10 +115,10 @@ void listFiles(const char* pathName)
             {
                 char filePath[strlen(pathName) + 1 + strlen(file->d_name) + 1];
                 stringJoin(filePath, pathName, file->d_name);
-                addToList(file, filePath);
-                puts(file->d_name);
-            }
-        }
+                if( !checkForDuplicates(filePath) )
+                  addToList(file, filePath);
+            }//TO NIE FOLDER
+        }//while
 
     }//otwieranie
     else //blad
@@ -96,6 +126,7 @@ void listFiles(const char* pathName)
         printf("Blad otwarcia sciezki %s\n", pathName);
         return;
     }//blad
+    closedir(path);
 }
 
 void dirShow(const char* pathName) //DEBUG
@@ -126,9 +157,25 @@ void listShow()//DEBUG
     }
 }
 
+void deleteList()
+{
+    fileInfo* i = head;
+    fileInfo* j = head;
+    while(j)
+    {
+        j = j->next;
+        free(i);
+        i = j;
+    }
+}
+
 int main(int argc, char* argv[])
 {
+    if(argc != 2)
+    {
+        puts("Podaj lokalizacje folderu.");
+        return 1;
+    }
     listFiles(argv[1]);
-    printf("\n");
-    listShow();
+    deleteList();
 }

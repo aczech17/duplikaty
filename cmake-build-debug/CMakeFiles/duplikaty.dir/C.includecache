@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/tytjan17/Dokumenty/duplikaty/main.c
+/home/tytjan17/CLionProjects/duplikaty/main.c
 stdio.h
 -
 stdlib.h
